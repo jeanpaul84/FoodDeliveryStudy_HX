@@ -1,0 +1,10 @@
+# Introduction
+
+For this study, I will dive deep into the [Food Delivery Time](https://www.kaggle.com/datasets/gautamdeora7/food-delivery-time-a-multi-factor-dataset/data) dataset. The goal of this study is to correctly predict
+
+```{r}
+data <- read.csv("data/Food_Time_Data_Set.csv")
+```
+
+```{r}
+```
