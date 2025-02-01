@@ -150,3 +150,7 @@ data %>%
   group_by(Restaurant_latitude, Restaurant_longitude) %>% 
   summarize(order_count = n()) %>% 
   arrange(desc(order_count))
+
+data %>% 
+  filter(Restaurant_latitude == 11.0213 & Restaurant_longitude == 76.995) %>% 
+  head(.)
