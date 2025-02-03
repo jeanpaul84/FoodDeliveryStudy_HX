@@ -122,33 +122,57 @@ str(data)
 
 ## Now there's a more uniform column name standard.
 
+# Per-column Analysis --------------
+
 #ID Variable
 
-n_distinct(data$ID)
+n_distinct(data$id)
 
-## Interistingly, there are less distinct ID values than rows.
+nrow(data)
 
-sum(is.na(data$ID))
+## Interistingly, there are less distinct ID values (9037) than rows (9040).
+
+data %>% 
+  group_by(id) %>% 
+  summarize(appearances = n()) %>% 
+  arrange(desc(appearances))
+
+data %>% 
+  filter(id == "6.00E+02")
+
+## There doesn't seem to be any anormal values, the only remarkable detail is that the coordinates of both the restaurant and the delivery destination are similar between entries.
+
+data %>% 
+  filter(id == "6.00E+03")
+
+## Again the coordinates are similar, but that's about it.
+
+data %>% 
+  filter(id == "9.00E+02")
+
+## In here the longitudes between rows vary greatly, but the latitudes do kind of match.
+
+sum(is.na(data$id))
 
 ## There are no null values
 
 # Delivery Person Id
 
-head(data$Delivery_person_ID, n=8)
+head(data$delivery_person_id, n=8)
 
-n_distinct(data$Delivery_person_ID)
+n_distinct(data$delivery_person_id)
 
-## In this dataset there's only 1286 different delivery people, meaning that the dataset has multiple deliveries from a single person.
+## In this dataset there's only 1134 different delivery people, meaning that the dataset has multiple deliveries from a single person.
 
-sum(is.na(data$Delivery_person_ID))
+sum(is.na(data$delivery_person_id))
 
 ## There are no null values
 
 # Delivery Person Age
 
-head(data$Delivery_person_Age, n=8)
+head(data$delivery_person_age, n=8)
 
-min(data$Delivery_person_Age)
+min(data$delivery_person_age)
 
 ## Min doesn't work since there's a null value.
 
