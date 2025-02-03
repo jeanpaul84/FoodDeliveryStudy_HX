@@ -7,6 +7,121 @@ str(data)
 
 head(data)
 
+# Categorical Columns
+
+## 'Type of order' seems to be a categorical columns, but by default it has a 'chr' type, so it will be converted into a factor column. The same happens with type_of_vehicle, weather_description and traffic_level
+
+data <- data %>% 
+  mutate(Type_of_order = as.factor(Type_of_order),
+         Type_of_vehicle = as.factor(Type_of_vehicle),
+         weather_description = as.factor(weather_description),
+         Traffic_Level = as.factor(Traffic_Level))
+
+str(data)
+
+# Numerical columns
+
+## Most numerical columns seem to be correct except for the TARGET column and the 'Distance..km' columns
+
+
+
+data <- data %>%
+  mutate(Distance..km. = as.numeric(Distance..km.),
+         TARGET = as.numeric(TARGET))
+
+## The conversion was done, but NAs were introduced by coercion.
+
+sum(is.na(data$Distance..km.))
+
+sum(is.na(data$TARGET))
+
+## Maybe the NA values in Distance happen to also affect into an NA in TARGET
+
+data %>% 
+  filter(is.na(Distance..km.) & is.na(TARGET)) %>% 
+  head(.)
+
+## All values shown that have NA in distance also have NA in TARGET. To see if the result is a value close to 921 (the amount of total NA values in Distance), the amount of rows that have NA in both distance and target will be calculated.
+
+data %>% 
+  filter(is.na(Distance..km.) & is.na(TARGET)) %>% 
+  summarize(nrow(.))
+
+## These values are not useful towards the model later on because these are values that cannot be predicted at all. As a result, these values will be removed from the dataset.
+
+data <- data %>%  
+  filter( !(is.na(Distance..km.) & is.na(TARGET)) ) 
+
+## Now, re-calculating the count of na values:
+
+sum(is.na(data$Distance..km.))
+
+sum(is.na(data$TARGET))
+
+## Analyzing the remaining Distance values:
+
+data %>% 
+  filter(is.na(Distance..km.))
+
+## It seems that all of the other needed values are still there for these rows, so I will use the restaurant coordinates vs. the delivery location coordinates to fill the distance:
+## https://community.esri.com/t5/coordinate-reference-systems-blog/distance-on-a-sphere-the-haversine-formula/ba-p/902128
+## https://github.com/rspatial/geosphere
+
+if(!require(geosphere)) install.packages("geosphere", repos = "http://cran.us.r-project.org")
+
+library(geosphere)
+
+new_distances <- data %>%
+  filter(is.na(Distance..km.)) %>% 
+  rowwise() %>%
+  mutate(new_distance = distHaversine(c(Restaurant_longitude, Restaurant_latitude),
+                                     c(Delivery_location_longitude, Delivery_location_latitude)) / 1000) %>% 
+  head(.) %>% 
+  select(Distance..km.,
+         new_distance,
+         Restaurant_latitude, 
+         Restaurant_longitude, 
+         Delivery_location_latitude, 
+         Delivery_location_longitude,
+         TARGET) %>% 
+  pull(new_distance)
+
+data[is.na(data$Distance..km.), "Distance..km."] <- new_distances
+
+sum(is.na(data$Distance..km.))
+
+rm(new_distances)
+
+## It can be seen that now there's no more NA values in the Distance..km. column.
+
+## Now analyzing the leftover TARGET NA values:
+
+sum(is.na(data$TARGET))
+
+data[is.na(data$TARGET),]
+
+# The amount of rows that will be in the na-cleaned dataset is:
+nrow(data) - sum(is.na(data$TARGET))
+
+## There are 45 missing values in the target variable, because the goal of this study is to train the algorithm on the most accurate data available, then the best option for these NA values is to delete them, since filling them in any way can introduce an incorrect bias that could prevent the model from learning correct patterns from the data.
+
+data <- data[!is.na(data$TARGET),]
+
+nrow(data)
+
+# Variable names
+
+## In the provided dataset there's no standard naming convention for the columns, some start with a capital letter while others don't and some are in all-caps (TARGET and ID) while others aren't.
+
+colnames(data) <- c("id", "delivery_person_id", "delivery_person_age", "delivery_person_ratings",
+  "restaurant_latitude", "restaurant_longitude", "delivery_loc_latitude",
+  "delivery_loc_longitude", "order_type", "vehicle_type", "temperature", "humidity",
+  "precipitation", "weather_type", "X", "traffic_level", "distance", "delivery_time_min")
+
+str(data)
+
+## Now there's a more uniform column name standard.
+
 #ID Variable
 
 n_distinct(data$ID)
@@ -153,4 +268,4 @@ data %>%
 
 data %>% 
   filter(Restaurant_latitude == 11.0213 & Restaurant_longitude == 76.995) %>% 
-  head(.)
+  summarize(mean_)
