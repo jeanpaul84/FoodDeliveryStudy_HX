@@ -230,6 +230,15 @@ data %>%
 
 ## A possible cause for this is that the program made to assign 'delivery_person_id's to workers aren't meant to generate one per worker, instead it could generate one per delivery in real time, and when one delivery_person_id is no longer in use, then it could re-assign it to another delivery, hence another possible driver.
 
+
+## Checking to see if the driver's age has to do with the delivery time:
+
+data %>% 
+  ggplot(aes(delivery_person_age, delivery_time_min)) +
+  geom_point(col = "black")
+
+## There's no clear effect of the age on the delivery time.
+
 # Delivery person Ratings -----------
 
 min(data$delivery_person_ratings)
@@ -508,3 +517,45 @@ data %>%
 
 ## Usually, extremely quick deliveries are rare, as well as extremely delayed ones, with the middleground being more common. This behavior is seen in the histogram.
 
+# Handling missing data
+
+sum(is.na(data))
+
+## There's no missing data.
+
+# Handling inconsistent values:
+
+## It was pointed out before that the delivery_person_id column is basically made up of inconsistent values (not the expected behavior for this study), since it can't identify a singular person.
+
+data %>% 
+  group_by(delivery_person_id) %>% 
+  distinct(delivery_person_age) %>% 
+  summarize(distinct_ages = n())
+
+## So this column will be deleted.
+
+data <- data %>% 
+  select(-delivery_person_id)
+
+## The 'id' column was also shown to be of little value:
+data %>%
+  group_by(id) %>%
+  summarize(appearances = n()) %>%
+  arrange(desc(appearances))
+
+data %>%
+  filter(id == "6.00E+02")
+
+## Here the same id is assigned to different people and different deliveries.
+
+
+data <- data %>% 
+  select(-id)
+
+## The 'id' column has been removed.
+
+str(data)
+
+sum(duplicated(data))
+
+## There are no duplicate entries in the data
