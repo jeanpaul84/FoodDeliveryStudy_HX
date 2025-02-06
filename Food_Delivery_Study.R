@@ -1,4 +1,7 @@
+if (!require(dplyr)) install.packages("dplyr")
 library(dplyr)
+
+if (!require(ggplot2)) install.packages("ggplot2")
 library(ggplot2)
 
 data <- read.csv("data/Food_Time_Data_Set.csv")
@@ -260,6 +263,13 @@ data %>%
 
 ## So again, an accurate count of the number of distinct people (in order to count the amount of people per rating) cannot be obtained.
 
+## Checking on the possible effect of age on delivery time:
+
+data %>% 
+  ggplot(aes(x = delivery_person_ratings, y = delivery_time_min)) +
+  geom_point(col = "black")
+
+## The rating itself doesn't seem to have an effect on delivery time since all ratings deliver on very similar timeframes.
 
 # Restaurant latitude and longitude 
 
@@ -559,3 +569,25 @@ str(data)
 sum(duplicated(data))
 
 ## There are no duplicate entries in the data
+
+# Dataset split
+
+if (!require(caret)) install.packages("caret")
+library(caret)
+
+set.seed(2025)
+
+train_indexes <- createDataPartition(data$delivery_time_min, p = 0.8, list = FALSE)
+train_data <- data[train_indexes,]
+test_data <- data[-train_indexes,]
+
+# Outlier deletion
+
+## No outliers will be deleted since important features like the distance correlate very well and give good insights for predicting the delivery time.
+
+# Data Scaling
+
+## Since the models that are going to be used are linear regression and decision trees, then no scaling is needed (both models aren't sensible to scale).
+
+# Feature selection
+
