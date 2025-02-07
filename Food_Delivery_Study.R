@@ -366,7 +366,7 @@ data %>%
             delivery_distance = mean(distance)) %>% 
   arrange(desc(appearances))
 
-## As it was hinted at previously, the bicycle riders indeed have a lower aaverage delivery distance when compared to motorcycle riders for example.
+## As it was hinted at previously, the bicycle riders indeed have a lower average delivery distance when compared to motorcycle riders for example.
 
 ## An interesting remark are the scooter riders. While using a scooter does include physicality during work (but not as much as bicycles do), it still remains the second most-used vehicle type for food transportation.
 
@@ -392,7 +392,7 @@ data %>%
 
 ## It is surprising to see that the most-heated deliveries are the ones who usually have lower delivery times. However, an argument can be made that states that this could be because people that live closer to these restaurants have a hotter climate than those who live further away. Things like the heat from gas car engines are prejudicial for the climate (therefore hotter temperatures).
 
-## So the temperature seems to correlate to the delivery time, but it does so in the contrary sense to the one thought.
+## So the temperature seems to correlate to the delivery time (although the effect is very low), but it does so in the contrary sense to the one thought.
 
 # Humidity
 
@@ -627,3 +627,11 @@ correlation_matrix %>%
   geom_tile() +
   theme(axis.text.x = element_text(angle = 90),
         axis.title = element_blank())
+
+## It can be seen that distance itself has the lightest color out of all of the possible features, with temperature being the next-lightest. This was hinted at in during the EDA process where both variables were examined (including their effect on delivery time).
+
+## So, thanks to the EDA and the confirmation of this heatmap, the features of the model will be:
+## order_type, vehicle_type, temperature, weather_type, traffic_level and distance.
+
+
+# Model Implementation ------------------------------
