@@ -591,3 +591,39 @@ test_data <- data[-train_indexes,]
 
 # Feature selection
 
+nums <- lapply(data, is.numeric)
+nums <- unlist(nums)
+
+data[, nums]
+
+
+correlation_matrix <- cor(data[,nums])
+correlation_matrix
+
+## These values contain a lot of numbers, so rounding will be used again here for ease-of-read purposes.
+
+correlation_matrix <- round(correlation_matrix, 2)
+correlation_matrix
+
+str(correlation_matrix)
+
+head(correlation_matrix)
+
+## Converting the data into a long format (it's currently as a wide format):
+
+if (!require(reshape2)) install.packages("reshape2")
+library(reshape2)
+
+correlation_matrix <- melt(correlation_matrix)
+
+head(correlation_matrix)
+
+## Now it can be seen that the relationships between variables are described in just 2 columns, rather than a lot more (as it was before).
+
+## Now creating a correlation heatmap
+
+correlation_matrix %>% 
+  ggplot(aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile() +
+  theme(axis.text.x = element_text(angle = 90),
+        axis.title = element_blank())
