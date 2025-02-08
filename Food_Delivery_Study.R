@@ -653,11 +653,16 @@ rmse(test_data$delivery_time_min, y_hat_lr)
 
 ## Random Forest
 
+### First, the random forest package needs to be installed and loaded:
 if (!require(randomForest)) install.packages("randomForest")
 library(randomForest)
 
+### Setting up k as 10 for k-fold cross validation:
+
 train_control <- trainControl(method = "cv",
                               number = 10)
+
+### Training the model on the train_data dataset:
 
 rf_model <- train(delivery_time_min ~ order_type + temperature + weather_type + traffic_level + distance,
                   data = train_data,
@@ -666,3 +671,7 @@ rf_model <- train(delivery_time_min ~ order_type + temperature + weather_type + 
 rf_model
 
 plot(varImp(rf_model))
+
+y_hat_rf <- predict(rf_model, newdata = test_data)
+
+rmse(test_data$delivery_time_min, y_hat_rf)
