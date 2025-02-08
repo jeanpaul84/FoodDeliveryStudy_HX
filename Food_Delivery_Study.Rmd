@@ -9,6 +9,11 @@ editor_options:
 For this study, I will dive deep into the [Food Delivery Time](https://www.kaggle.com/datasets/gautamdeora7/food-delivery-time-a-multi-factor-dataset/data) dataset.
 The goal of this study is to correctly predict
 
+# Analysis
+
+In order to start with the analysis process, it is important to install and import two of the main packages for data cleaning and exploration (`dplyr` and `ggplot2`).
+Also, the dataset will be read from the `data/` directory and it's head (first 6 rows) and structure will be printed out in order to get an initial approach to the dataset itself:
+
 ```{r}
 if (!require(dplyr)) install.packages("dplyr")
 library(dplyr)
@@ -19,12 +24,25 @@ library(ggplot2)
 data <- read.csv("data/Food_Time_Data_Set.csv")
 
 str(data)
+```
 
+Looking at the structure of the dataset, there are `chr` values (like string, normal text), `int` values (integers) and `nums` (floating-point numbers), with `logi` being values either TRUE or FALSE (having a similar behavior to `booleans` in other programming languages).
+
+Now taking a look into the first 6 rows of the dataset:
+
+```{r}
 head(data)
 ```
 
-Categorical Columns 'Type of order' seems to be a categorical columns, but by default it has a 'chr' type, so it will be converted into a factor column.
-The same happens with type_of_vehicle, weather_description and traffic_level
+From this we can see that the `ID` and `Delivery_person_ID` are some type of made-up strings that meant something to another database or system possibly.
+
+Also, it can be pointed out that there are several categorical variables in the dataset like `traffic_level`.
+Additionally, the X column seems to be of no value to the dataset, although this will be studied later on.
+
+## Categorical Columns
+
+`Type_of_order` seems to be a categorical column, but by default it has a 'chr' type, so it will be converted into a factor column (since factors are the main way of handling with categorical variables).
+The same happens with `type_of_vehicle`, `weather_description` and `traffic_level`, so these columns will also be converted into factors:
 
 ```{r}
 data <- data %>% 
@@ -36,7 +54,12 @@ data <- data %>%
 str(data)
 ```
 
-Numerical columns Most numerical columns seem to be correct except for the TARGET column and the 'Distance..km' columns
+Now the respective variables have their types as `Factor`.
+
+## Numerical columns
+
+Most numerical columns seem to be correct except for the TARGET column and the 'Distance..km' columns.
+These should be numerical columns so they will be converted into the right type:
 
 ```{r}
 data <- data %>%
@@ -44,7 +67,9 @@ data <- data %>%
          TARGET = as.numeric(TARGET))
 ```
 
-The conversion was done, but NAs were introduced by coercion.
+The conversion was done, but NAs were introduced by coercion (this means that those values that couldn't be converted into a numeric type by R were assinged the `NA` value).
+
+Checking to see how much of these values couldn't be converted:
 
 ```{r}
 sum(is.na(data$Distance..km.))
@@ -52,16 +77,19 @@ sum(is.na(data$Distance..km.))
 sum(is.na(data$TARGET))
 ```
 
-Maybe the NA values in Distance happen to also affect into an NA in TARGET
+There were 921 values in the `Distance..km.` column who were assigned `NA` while 961 were assigned `NA` in the `TARGET` column.
+
+These amounts seem to be very close to each other, so maybe the `NA` values in `Distance..km.` happen to also affect into an `NA` in `TARGET`?
 
 ```{r}
 data %>% 
   filter(is.na(Distance..km.) & is.na(TARGET)) %>% 
-  head(.)
+  head(.) %>% 
+  select(Delivery_person_ID, Distance..km., TARGET)
 ```
 
 All values shown that have NA in distance also have NA in TARGET.
-To see if the result is a value close to 921 (the amount of total NA values in Distance), the amount of rows that have NA in both distance and target will be calculated.
+To see if the result is a value close to 921 (the amount of total NA values in Distance), the amount of rows that have NA in both distance and target will be calculated:
 
 ```{r}
 data %>% 
@@ -69,8 +97,8 @@ data %>%
   summarize(nrow(.))
 ```
 
-These values are not useful towards the model later on because these are values that cannot be predicted at all.
-As a result, these values will be removed from the dataset.
+These values are not useful towards the model later on because these are values that cannot be predicted at all (the target variable has no value).
+As a result, these values will be removed from the dataset:
 
 ```{r}
 data <- data %>%  
@@ -85,7 +113,9 @@ sum(is.na(data$Distance..km.))
 sum(is.na(data$TARGET))
 ```
 
-Analyzing the remaining Distance values:
+The counts of `NA` values decreased by a big margin, leaving only 5 and 45 in `Distance..km.` and `TARGET` respectively.
+
+Analyzing the remaining `Distance..km.` `NA` values:
 
 ```{r}
 data %>% 
@@ -123,7 +153,7 @@ rm(new_distances)
 
 It can be seen that now there's no more NA values in the Distance..km.
 column.
-Now analyzing the leftover TARGET NA values:
+Now analyzing the leftover `TARGET` `NA` values:
 
 ```{r}
 sum(is.na(data$TARGET))
@@ -144,6 +174,8 @@ data <- data[!is.na(data$TARGET),]
 
 nrow(data)
 ```
+
+The resulting row count after deleting the rest of `NA` values in the dataset is 9040.
 
 Variable names In the provided dataset there's no standard naming convention for the columns, some start with a capital letter while others don't and some are in all-caps (TARGET and ID) while others aren't.
 
