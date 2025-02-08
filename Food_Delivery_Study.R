@@ -650,3 +650,19 @@ library(Metrics)
 y_hat_lr <- predict(lr_model, newdata = test_data)
 
 rmse(test_data$delivery_time_min, y_hat_lr)
+
+## Random Forest
+
+if (!require(randomForest)) install.packages("randomForest")
+library(randomForest)
+
+train_control <- trainControl(method = "cv",
+                              number = 10)
+
+rf_model <- train(delivery_time_min ~ order_type + temperature + weather_type + traffic_level + distance,
+                  data = train_data,
+                  method = "rf",
+                  trControl = train_control)
+rf_model
+
+plot(varImp(rf_model))
