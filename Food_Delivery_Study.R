@@ -635,3 +635,18 @@ correlation_matrix %>%
 
 
 # Model Implementation ------------------------------
+
+lr_model <- lm(delivery_time_min ~ order_type + vehicle_type + temperature + weather_type +
+     traffic_level + distance, data = train_data)
+summary(lr_model)
+
+lr_model <- lm(delivery_time_min ~ order_type + temperature + weather_type +
+                 traffic_level + distance, data = train_data)
+summary(lr_model)
+
+if (!require(Metrics)) install.packages("Metrics")
+library(Metrics)
+
+y_hat_lr <- predict(lr_model, newdata = test_data)
+
+rmse(test_data$delivery_time_min, y_hat_lr)
