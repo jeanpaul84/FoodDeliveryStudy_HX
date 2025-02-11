@@ -1049,7 +1049,39 @@ y_hat_rf <- predict(rf_model, newdata = test_data)
 rmse(test_data$delivery_time_min, y_hat_rf)
 ```
 
+The lowest RMSE obtained during training for the random forest model is 3.577116, with an `mtry` value of 23.
+Along with this, the RMSE of the predictions on the testing set was also calculated, and the obtained value is 3.642145.
+This value is significantly lower than the 5.301928 RMSE that Linear Regression yields.
+
 # Results
+
+After doing an extensive analysis section that studied each variable along with its intrinsic patterns, correlations with the target variable and inconsistencies, the best correlated features (variables) were selected.
+The selected features were:
+
+-   `order_type`
+
+-   `vehicle_type`
+
+-   `temperature`
+
+-   `weather_type`
+
+-   `traffic_level`
+
+-   `distance`
+
+These features were used by a Linear Regression model and a Random Forest model.
+After training both models, the RMSE between them was compared in order to gather a consistent metric that permitted a correct and objective selection of the best model.
+
+The resulting RMSE's are the following:
+
+-   **Linear Regression:** Less computationally expensive, RMSE = 5.301928.
+
+-   **Random Forest:** More computationally expensive, RMSE = 3.642145.
+
+Both of these RMSE's reported are the RMSE values that result when comparing the actual testing data to the model's predictions.
+
+From this, it can be seen that the Random Forest model is the clear winner in this case, having a RMSE that is lower than the Linear Regression counterpart by 1.659783.
 
 # Conclusion
 
