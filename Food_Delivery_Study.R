@@ -63,6 +63,14 @@
 #' 
 #' -   Random Forest
 #' 
+#' The main metric that will be used to compare both algorithms will be RMSE,
+#' what this does is that it calculates de root of the square differences between
+#' the predicted values and the real (observed) values. This means that a lower RMSE
+#' means a better model (error decreases). This metric is specifically useful
+#' since it also takes into consideration "big errors" that could occur through the
+#' model.
+#' 
+#' 
 #' # Analysis
 #' 
 #' In order to start with the analysis process, it is important to install and import two of the main packages for data cleaning and exploration (`dplyr` and `ggplot2`).
@@ -187,7 +195,7 @@ new_distances <- data %>%
   filter(is.na(Distance..km.)) %>% 
   rowwise() %>%
   mutate(new_distance = distHaversine(c(Restaurant_longitude, Restaurant_latitude),
-                                     c(Delivery_location_longitude, Delivery_location_latitude)) / 1000) %>% 
+            c(Delivery_location_longitude, Delivery_location_latitude)) / 1000) %>% 
   head(.) %>% 
   select(Distance..km.,
          new_distance,
