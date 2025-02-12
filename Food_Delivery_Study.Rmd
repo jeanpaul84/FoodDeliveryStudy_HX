@@ -1,8 +1,9 @@
 ---
-editor_options: 
-  markdown: 
+editor_options:
+  markdown:
     wrap: sentence
 bibliography: ./bib/references.bib
+output: pdf_document
 ---
 
 # Introduction
@@ -186,7 +187,7 @@ new_distances <- data %>%
   filter(is.na(Distance..km.)) %>% 
   rowwise() %>%
   mutate(new_distance = distHaversine(c(Restaurant_longitude, Restaurant_latitude),
-                                     c(Delivery_location_longitude, Delivery_location_latitude)) / 1000) %>% 
+            c(Delivery_location_longitude, Delivery_location_latitude)) / 1000) %>% 
   head(.) %>% 
   select(Distance..km.,
          new_distance,
@@ -211,7 +212,7 @@ Now analyzing the leftover `TARGET` `NA` values:
 ```{r}
 sum(is.na(data$TARGET))
 
-data[is.na(data$TARGET),]
+head(data[is.na(data$TARGET),])
 ```
 
 The amount of rows that will be in the na-cleaned dataset is:
@@ -913,11 +914,11 @@ It is important to mention that these correlation calculations will be done on n
 nums <- lapply(data, is.numeric)
 nums <- unlist(nums)
 
-data[, nums]
+head(data[, nums])
 
 
 correlation_matrix <- cor(data[,nums])
-correlation_matrix
+head(correlation_matrix)
 ```
 
 These values contain a lot of numbers, so rounding will be used again here for ease-of-read purposes.
@@ -925,7 +926,6 @@ The rounding will be done to 2 decimal places.
 
 ```{r}
 correlation_matrix <- round(correlation_matrix, 2)
-correlation_matrix
 
 head(correlation_matrix)
 ```
@@ -1052,6 +1052,8 @@ rmse(test_data$delivery_time_min, y_hat_rf)
 The lowest RMSE obtained during training for the random forest model is 3.577116, with an `mtry` value of 23.
 Along with this, the RMSE of the predictions on the testing set was also calculated, and the obtained value is 3.642145.
 This value is significantly lower than the 5.301928 RMSE that Linear Regression yields.
+
+It can also be seen that the most influential variable while predicting delivery time in random forest is the traffic level, especially when this variable has the "Very High" traffic value, with `distance` being the second most important variable after that level of traffic.
 
 # Results
 
